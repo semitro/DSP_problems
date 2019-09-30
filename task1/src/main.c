@@ -30,7 +30,7 @@ void test(signal_data_t *data, unsigned int sample_len,
           coeff_data_t  *h_values, unsigned int h_len,
           signal_data_t *expected_out)
 {
-    static unsigned int test_num = 0;
+    static unsigned int test_num = 1;
     puts("\n***************");
     printf("Test #%d\n", test_num);
     test_num++;
@@ -83,13 +83,12 @@ void test_zero(){
 
 void test_negative(){
     coeff_data_t    hh[]   = {0., -1.};
-    signal_data_t data[]   = {-1984.42,  -3., 0.,  3., 1984.42};
-    signal_data_t result[] = {1., -2., -3., 4., 5.};
+    signal_data_t data[]   = {-1984.42,  -3., 0.,   3.,  1984.42};
+    signal_data_t result[] = {-1984.42,   3., 0.,  -3., -1984.42};
     test(data, sizeof(data)/sizeof(signal_data_t),
          hh,   sizeof (hh)/sizeof(coeff_data_t),
          result);
 }
-
 
 void test_avg(){
     coeff_data_t    hh[]   = {1/3., 1/3., 1/3.};
@@ -100,13 +99,22 @@ void test_avg(){
          result);
 }
 
+void test_combined(){
+    coeff_data_t    hh[]   = {-5., 10., 0.5, 1., 2.};
+    signal_data_t data[]   = { 5., 2.5, 10, 0., 10.,   1.,   0.,  -1.,  -2.,   7};
+
+    signal_data_t result[] = { 5., 2.5, 10, 0., 25., 99.5, -44., 98.5, -45., 6.5};
+
+    test(data, sizeof(data)/sizeof(signal_data_t),
+         hh, sizeof (hh)/sizeof (coeff_data_t),
+         result);
+}
 int main(){
-    for(size_t i = 5; i >= 1; i--){
-        printf("%d\n", i);
-    }
     test_trivial();
     test_zero();
     test_negative();
     test_avg();
+    test_combined();
+
     return 0;
 }
