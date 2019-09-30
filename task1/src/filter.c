@@ -1,17 +1,39 @@
 #include "filter.h"
 
 void fir_simple(Signal *signal, FIR_Filter *filter){
+    if(signal->len < filter->len){
+        printf("filter::fir_simple: len of signal"
+               " is less than len of filter!");
+        return;
+    }
     signal_data_t *data  = signal->data;
-    const uint16_t h_num = filter->len;
+    const size_t h_num   = filter->len;
     coeff_data_t *h      = filter->h;// const!
-
     signal_data_t sum;
-    for(uint8_t i = h_num; i < signal->len; i++){
+    size_t        h_index;
+    const size_t  window_shift = h_num - 1; // We can't start to filter from the very beggining
+
+/*
+    for(size_t i = window:_shift; i < signal->len; i++){
         sum = 0;
-       for(uint8_t j = 0; j < h_num; j++){
-           sum += data[i-j]*h[j];
+        h_index = 0;
+       for(size_t j = i - window_shift; j <= i; j++){
+           sum += data[j]*h[h_index];
+           h_index++;
        }
-       data[i-h_num] = sum;
+        data[i-window_shift] = sum;
+    }
+
+ */
+    size_t i = signal->len;
+    while(i-- != window_shift){
+        sum = 0;
+        h_index = 0;
+       for(size_t j = i - window_shift; j <= i; j++){
+           sum += data[j]*h[h_index];
+          h_index++;
+       }
+       data[i] = sum;
     }
 }
 

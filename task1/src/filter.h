@@ -2,19 +2,20 @@
 #define FILTER_H
 
 #include <stdint.h>
+#include <stddef.h>
 
-typedef float signal_data_t;
+typedef double signal_data_t;
 
 typedef struct Signal{
     signal_data_t* data;
-    uint32_t len; 
+    size_t len;
 }Signal;
 
-typedef float coeff_data_t;
+typedef double coeff_data_t;
 
 typedef struct FIR_Filter{
     coeff_data_t *h;
-    uint16_t len;
+    size_t len;
 }FIR_Filter;
 
 
