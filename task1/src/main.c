@@ -109,7 +109,29 @@ void test_combined(){
          hh, sizeof (hh)/sizeof (coeff_data_t),
          result);
 }
+#include <xmmintrin.h>
+//CPUID Flags: SSE3
+#include <pmmintrin.h>
+
 int main(){
+    union memes{__m128 b; float f[4];};
+
+    __m128 hello = _mm_set_ps (1., 2., 3., 4.);
+    __m128 hey;
+    hey = _mm_set_ps(1., 1., 1., 1.);
+    hello = _mm_mul_ps(hello, hey);
+    union memes a;
+    a.b = hello;
+    printf("%f., %f., %f., %f.\n", a.f[0], a.f[1], a.f[2], a.f[3]);
+    hello = _mm_hadd_ps(hello, hey);
+    a.b = hello;
+    printf("%f., %f., %f., %f.\n", a.f[0], a.f[1], a.f[2], a.f[3]);
+    hello = _mm_hadd_ps(hello, hey);
+    a.b = hello;
+    //hello = _mm_hadd_ps(hello, hello);
+
+    printf("%f., %f., %f., %f.\n", a.f[0], a.f[1], a.f[2], a.f[3]);
+    return 0;
     test_trivial();
     test_zero();
     test_negative();
