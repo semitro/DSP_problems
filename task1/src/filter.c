@@ -1,33 +1,10 @@
 #include "filter.h"
-#include <immintrin.h>
 
-static inline void fir_simple(Signal *signal, FIR_Filter *filter){
-    if(signal->len < filter->len){
-        printf("filter::fir_simple: len of signal"
-               " is less than len of filter!"); // where to include?
-        return;
-    }
-
-    const size_t  window_shift = filter->len - 1; // We can't start to filter from the very beggining
-    signal_data_t sum = 0.f;
-    size_t h_index = 0;
-    size_t i = signal->len;
-
-    while(i-- != window_shift){
-        sum = 0;
-        h_index = 0;
-       for(size_t j = i - window_shift; j <= i; j++){
-           sum += signal->data[j]*filter->h[h_index];
-          h_index++;
-       }
-       signal->data[i] = sum;
-    }
-}
-
+#ifdef USE_SSE
 #define XMM_SIZE 4 /* how many floats can be stored in xmm register */
 typedef union mem128_bulk {__m128 m; float f[XMM_SIZE];}mem128_bulk;
 
-static inline void fir_SIMD(Signal *signal, FIR_Filter *filter){
+static inline void fir_SIMD(Signal *signal, const FIR_Filter *filter){
     const size_t window_shift = filter->len - 1; // We can't start to filter from the very beggining
     const size_t h_remainder = filter->len % XMM_SIZE; // how many elements we need to count without SIMD
 
@@ -59,13 +36,36 @@ static inline void fir_SIMD(Signal *signal, FIR_Filter *filter){
        signal->data[i] = sum;
     }
 }
+#else /*if USE_SSE is not define */
+static inline void fir_simple(Signal *signal, const FIR_Filter *filter){
+    const size_t  window_shift = filter->len - 1; // We can't start to filter from the very beggining
+    signal_data_t sum = 0.f;
+    size_t h_index = 0;
+    size_t i = signal->len;
 
-
-void apply_FIR(Signal *signal, FIR_Filter *filter){
-    fir_SIMD(signal, filter);
-    //fir_simple(signal, filter);
+    while(i-- != window_shift){
+        sum = 0;
+        h_index = 0;
+       for(size_t j = i - window_shift; j <= i; j++){
+           sum += signal->data[j]*filter->h[h_index];
+          h_index++;
+       }
+       signal->data[i] = sum;
+    }
 }
 
+#endif
 
-
+void apply_FIR(Signal *signal, const FIR_Filter *filter){
+    if(signal->len < filter->len){
+        printf("filter::fir_simple: len of signal"
+               " is less than len of filter!"); // where to include?
+        return;
+    }
+#ifdef USE_SSE
+    fir_SIMD(signal, filter);
+#else
+    fir_simple(signal, filter);
+#endif
+}
 

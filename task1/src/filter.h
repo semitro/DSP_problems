@@ -3,13 +3,13 @@
 
 #include <stdint.h>
 #include <stddef.h>
+#include <stdio.h>
 
-//#ifdef USE_SSE
+#ifdef USE_SSE
 #include <mmintrin.h>
 #include <xmmintrin.h>
-//CPUID Flags: SSE3
-#include <pmmintrin.h>
-//#endif
+#include <x86intrin.h>
+#endif
 
 typedef float signal_data_t;
 
@@ -26,6 +26,6 @@ typedef struct FIR_Filter{
 }FIR_Filter;
 
 
-void apply_FIR(Signal*, FIR_Filter*);
+void apply_FIR(Signal*, const FIR_Filter*);
 
 #endif // FILTER_H
