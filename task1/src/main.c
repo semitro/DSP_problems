@@ -5,7 +5,7 @@
 #include "filter.h"
 
 
-void print_signal(Signal* s){
+void print_signal(const Signal* s){
     printf("{");
     for(size_t i = 0; i < s->len; i++)
         printf("%.2f, ", s->data[i]);
@@ -15,7 +15,7 @@ void print_signal(Signal* s){
 
 void print_filter(FIR_Filter *filter){
     printf("{");
-    for (int i = 0; i < filter->len; i++) {
+    for (size_t i = 0; i < filter->len; i++) {
         printf("%.2f, ", filter->h[i]);
     }
     puts("}");
@@ -52,9 +52,9 @@ void test(signal_data_t *data, unsigned int sample_len,
     printf("Out    = ");
     print_signal(&sample);
 
-    for (int i = 0; i < sample_len; i++) {
+    for (size_t i = 0; i < sample_len; i++) {
         if(!feq(sample.data[i], expected_out[i])){
-            printf("TEST NOT PASSED: %.10f != %.10f at %d\n",
+            printf("TEST NOT PASSED: %.10f != %.10f at %lu\n",
                    sample.data[i], expected_out[i], i);
             return;
         }
