@@ -109,29 +109,34 @@ void test_combined(){
          hh, sizeof (hh)/sizeof (coeff_data_t),
          result);
 }
-#include <xmmintrin.h>
-//CPUID Flags: SSE3
-#include <pmmintrin.h>
+/*
+Filter = {-5.00, 10.00, 0.50, 1.00, 2.00, }
+Sample = {5.00, 2.50, 10.00, 0.00, 10.00, 1.00, 0.00, -1.00, }
+*/
+
+void test_aliq4_simple_h(){
+    coeff_data_t    hh[4]    = {1/4., 1/4., 1/4., 1/4.};
+    signal_data_t data[12]   = { 0., 1., 2., 3.,   4.,  5.,  6.,  7.,  8.,  9., 10., 11.};
+    signal_data_t result[12] = { 0., 1., 2., 1.5, 2.5, 3.5, 4.5, 5.5, 6.5, 7.5, 8.5, 9.5};
+    test(data, sizeof(data)/sizeof(signal_data_t),
+         hh, sizeof (hh)/sizeof (coeff_data_t),
+         result);
+}
+
+void test_aliq4_h2(){
+    coeff_data_t     hh[8]   = { 1.,  2., 3., 4.,  5., 6., 7.,  8.};
+    signal_data_t data[12]   = { 5., 2.5, 10, 0., 10., 1., 0.,  -1.,  1.,  1.,  1.,  1.};
+
+    signal_data_t result[12] = { 5., 2.5, 10, 0., 10., 1., 0., -36., 36., 36., 36., 36.};
+
+    test(data, sizeof(data)/sizeof(signal_data_t),
+         hh, sizeof (hh)/sizeof (coeff_data_t),
+         result);
+}
 
 int main(){
-    union memes{__m128 b; float f[4];};
-
-    __m128 hello = _mm_set_ps (1., 2., 3., 4.);
-    __m128 hey;
-    hey = _mm_set_ps(1., 1., 1., 1.);
-    hello = _mm_mul_ps(hello, hey);
-    union memes a;
-    a.b = hello;
-    printf("%f., %f., %f., %f.\n", a.f[0], a.f[1], a.f[2], a.f[3]);
-    hello = _mm_hadd_ps(hello, hey);
-    a.b = hello;
-    printf("%f., %f., %f., %f.\n", a.f[0], a.f[1], a.f[2], a.f[3]);
-    hello = _mm_hadd_ps(hello, hey);
-    a.b = hello;
-    //hello = _mm_hadd_ps(hello, hello);
-
-    printf("%f., %f., %f., %f.\n", a.f[0], a.f[1], a.f[2], a.f[3]);
-    return 0;
+    test_aliq4_simple_h();
+    test_aliq4_h2();
     test_trivial();
     test_zero();
     test_negative();
