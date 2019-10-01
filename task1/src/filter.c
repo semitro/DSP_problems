@@ -68,19 +68,37 @@ static inline void fir_SIMD(Signal *signal, FIR_Filter *filter){
     }*/
     //data_p = (signal->data + signal->len - 1); // point to last element
     size_t i = signal->len;
+    size_t j;
+    const size_t h_remainder = filter->len % XMM_REG_FLOAT_CAPACITY;
     signal_data_t sum = 0.f;
     while(i-- != window_shift){
         sum = 0;
         h_index = 0;
-       for(size_t j = i - window_shift; j <= i; j+= 4){
+        for(j = i - window_shift; j + h_remainder < i; j+= 4, h_index +=4){
+          //  printf("rem: %d, shift: %d, j-%d i-%d\n", h_remainder, window_shift, j, i );
             data_vector = _mm_loadu_ps(signal->data + j);
             h_vector    = _mm_loadu_ps(filter->h + h_index);
             data_vector = _mm_mul_ps(data_vector, h_vector);
             data_vector = _mm_hadd_ps(data_vector, data_vector); // d_v  = { half of horizontal summ, ... }
             data_vector = _mm_hadd_ps(data_vector, data_vector); // d_v[0] = horizontal sum (sum of sample[n-i]*h[k-i])
             sum += ((mem128_bulk*)&data_vector)->f[0]; // we got almost Xi using not all of the coefficients of the filter
-            h_index += 4;
+        }
+
+       // count the remainder
+        for( size_t k = 0; k < h_remainder; k++){
+          sum += signal->data[j]*filter->h[h_index];
+          h_index++;
+          j++;
+        }
+        /*
+        j -=4;
+        h_index -= 4;
+       while(j != i){
+         sum += signal->data[j]*filter->h[h_index];
+          h_index++;
+          j++;
        }
+       */
        data_p[i] = sum;
     }
 }

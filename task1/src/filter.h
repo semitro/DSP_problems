@@ -4,14 +4,21 @@
 #include <stdint.h>
 #include <stddef.h>
 
-typedef double signal_data_t;
+//#ifdef USE_SSE
+#include <mmintrin.h>
+#include <xmmintrin.h>
+//CPUID Flags: SSE3
+#include <pmmintrin.h>
+//#endif
+
+typedef float signal_data_t;
 
 typedef struct Signal{
     signal_data_t* data;
     size_t len;
 }Signal;
 
-typedef double coeff_data_t;
+typedef float coeff_data_t;
 
 typedef struct FIR_Filter{
     coeff_data_t *h;
