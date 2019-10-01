@@ -124,11 +124,9 @@ void test_aliq4_simple_h(){
 }
 
 void test_aliq4_h2(){
-    coeff_data_t     hh[8]   = { 1.,  2., 3., 4.,  5., 6., 7.,  8.};
-    signal_data_t data[12]   = { 5., 2.5, 10, 0., 10., 1., 0.,  -1.,  1.,  1.,  1.,  1.};
-
-    signal_data_t result[12] = { 5., 2.5, 10, 0., 10., 1., 0., -36., 36., 36., 36., 36.};
-
+    coeff_data_t     hh[8]   = { 1.,  2.,  3., 4.,  5., 6., 7.,  8.};
+    signal_data_t data[12]   = { 5., 2.5, 10., 0., 10., 1., 0., -1.,  1.,  1.,  1.,  1.};
+    signal_data_t result[12] = { 5., 2.5, 10., 0., 10., 1., 0., 88., 68.5, 53., 39., 34.};
     test(data, sizeof(data)/sizeof(signal_data_t),
          hh, sizeof (hh)/sizeof (coeff_data_t),
          result);
