@@ -7,22 +7,20 @@ static inline void fir_simple(Signal *signal, FIR_Filter *filter){
                " is less than len of filter!"); // where to include?
         return;
     }
-    signal_data_t *data  = signal->data;
-    const size_t h_num   = filter->len;
-    coeff_data_t *h      = filter->h;// const!
-    signal_data_t sum;
-    size_t        h_index;
-    const size_t  window_shift = h_num - 1; // We can't start to filter from the very beggining
 
+    const size_t  window_shift = filter->len - 1; // We can't start to filter from the very beggining
+    signal_data_t sum = 0.f;
+    size_t h_index = 0;
     size_t i = signal->len;
+
     while(i-- != window_shift){
         sum = 0;
         h_index = 0;
        for(size_t j = i - window_shift; j <= i; j++){
-           sum += data[j]*h[h_index];
+           sum += signal->data[j]*filter->h[h_index];
           h_index++;
        }
-       data[i] = sum;
+       signal->data[i] = sum;
     }
 }
 
@@ -30,8 +28,8 @@ static inline void fir_simple(Signal *signal, FIR_Filter *filter){
 typedef union mem128_bulk {__m128 m; float f[XMM_SIZE];}mem128_bulk;
 
 static inline void fir_SIMD(Signal *signal, FIR_Filter *filter){
-    const size_t  window_shift = filter->len - 1; // We can't start to filter from the very beggining
-    const size_t h_remainder = filter->len % XMM_SIZE;
+    const size_t window_shift = filter->len - 1; // We can't start to filter from the very beggining
+    const size_t h_remainder = filter->len % XMM_SIZE; // how many elements we need to count without SIMD
 
     __m128 h_vector;    // xmm register which contains filter coefficients
     __m128 data_vector; // xmm for data
@@ -39,6 +37,7 @@ static inline void fir_SIMD(Signal *signal, FIR_Filter *filter){
     size_t j;
     size_t h_index; // which filter coefficient is used at the moment
     size_t i = signal->len; // we're moving from the end to the beginning
+
     while(i-- != window_shift){ // don't process several first samples
         sum = 0;
         h_index = 0;
@@ -51,7 +50,6 @@ static inline void fir_SIMD(Signal *signal, FIR_Filter *filter){
             data_vector = _mm_hadd_ps(data_vector, data_vector); // d_v[0] = horizontal sum (sum of sample[n-i]*h[k-i])
             sum += ((mem128_bulk*)&data_vector)->f[0]; // we got sum for elements except several leftovers
         }
-
         // count the leftovers
         for( size_t k = 0; k < h_remainder; k++){
           sum += signal->data[j]*filter->h[h_index];
