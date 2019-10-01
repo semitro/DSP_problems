@@ -110,11 +110,11 @@ void test_combined(){
          result);
 }
 /*
-Filter = {-5.00, 10.00, 0.50, 1.00, 2.00, }
-Sample = {5.00, 2.50, 10.00, 0.00, 10.00, 1.00, 0.00, -1.00, }
-*/
-
-void test_aliq4_simple_h(){
+ * test below are crucial to check that xmm-routine handled correctly:
+ * they check different combinations of data and hh sizes
+ * (aliq is aliquot)
+ */
+void test_aliq4_h4(){
     coeff_data_t    hh[4]    = {1/4., 1/4., 1/4., 1/4.};
     signal_data_t data[12]   = { 0., 1., 2., 3.,   4.,  5.,  6.,  7.,  8.,  9., 10., 11.};
     signal_data_t result[12] = { 0., 1., 2., 1.5, 2.5, 3.5, 4.5, 5.5, 6.5, 7.5, 8.5, 9.5};
@@ -123,7 +123,7 @@ void test_aliq4_simple_h(){
          result);
 }
 
-void test_aliq4_h2(){
+void test_aliq4_h8(){
     coeff_data_t     hh[8]   = { 1.,  2.,  3., 4.,  5., 6., 7.,  8.};
     signal_data_t data[12]   = { 5., 2.5, 10., 0., 10., 1., 0., -1.,  1.,  1.,  1.,  1.};
     signal_data_t result[12] = { 5., 2.5, 10., 0., 10., 1., 0., 88., 68.5, 53., 39., 34.};
@@ -132,14 +132,35 @@ void test_aliq4_h2(){
          result);
 }
 
+void test_not_aliq_h7(){
+    coeff_data_t       hh[7] =                                 { 1., 2.,  3., 4.,  5., 6., 7.};
+    signal_data_t   data[13] = { 0., 1., -1., 2., -2., 3., -3.,  4.,  -4., 5.,  -5.,  6., 42.};
+    signal_data_t result[13] = { 0., 1., -1., 2., -2., 3., -6., 22., -10., 26., -14., 30., 318.};
+    test(data, sizeof(data)/sizeof(signal_data_t),
+         hh, sizeof (hh)/sizeof (coeff_data_t),
+         result);
+}
+
+void test_not_aliq_h9(){
+    coeff_data_t     hh[9]   = { 1.,  2.,  3., 4.,  5., 6., 7.,  8., -8.};
+    signal_data_t data[13]   = { 5., 2.5, 10., 0., 10., 1., 0., -1.,  1.,   1.,  1.,  1., 8.};
+    signal_data_t result[13] = { 5., 2.5, 10., 0., 10., 1., 0., -1., 80., 60.5, 45., 31., -30.};
+    test(data, sizeof(data)/sizeof(signal_data_t),
+         hh, sizeof (hh)/sizeof (coeff_data_t),
+         result);
+}
+
 int main(){
-    test_aliq4_simple_h();
-    test_aliq4_h2();
+
     test_trivial();
     test_zero();
     test_negative();
     test_avg();
     test_combined();
 
+    test_aliq4_h4();
+    test_aliq4_h8();
+    test_not_aliq_h7();
+    test_not_aliq_h9();
     return 0;
 }
