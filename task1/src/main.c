@@ -1,67 +1,6 @@
-#include <stdio.h>
-#include <stddef.h>
-#include <math.h>
-
+#include "test.h"
 #include "filter.h"
-
-
-void print_signal(const Signal* s){
-    printf("{");
-    for(size_t i = 0; i < s->len; i++)
-        printf("%.2f, ", s->data[i]);
-    puts("}");
-
-}
-
-void print_filter(FIR_Filter *filter){
-    printf("{");
-    for (size_t i = 0; i < filter->len; i++) {
-        printf("%.2f, ", filter->h[i]);
-    }
-    puts("}");
-}
-
-const double epsilon = 0.000001;
-int feq(double a, double b){
-    return fabs(a - b) < epsilon;
-}
-
-void test(signal_data_t *data, unsigned int sample_len,
-          coeff_data_t  *h_values, unsigned int h_len,
-          signal_data_t *expected_out)
-{
-    static unsigned int test_num = 1;
-    puts("\n***************");
-    printf("Test #%d\n", test_num);
-    test_num++;
-
-    printf("Filter = ");
-    FIR_Filter filter;
-    filter.h   = h_values;
-    filter.len = h_len;
-    print_filter(&filter);
-
-    printf("Sample = ");
-    Signal sample;
-    sample.data = data;
-    sample.len  = sample_len;
-    print_signal(&sample);
-
-    apply_FIR(&sample, &filter);
-
-    printf("Out    = ");
-    print_signal(&sample);
-
-    for (size_t i = 0; i < sample_len; i++) {
-        if(!feq(sample.data[i], expected_out[i])){
-            printf("TEST NOT PASSED: %.10f != %.10f at %lu\n",
-                   sample.data[i], expected_out[i], i);
-            return;
-        }
-    }
-
-    puts("Test passed");
-}
+#include <stddef.h>
 
 void test_trivial(){
     coeff_data_t    hh[]   = {1.};
@@ -102,7 +41,6 @@ void test_avg(){
 void test_combined(){
     coeff_data_t    hh[]   = {-5., 10., 0.5, 1., 2.};
     signal_data_t data[]   = { 5., 2.5, 10, 0., 10.,   1.,   0.,  -1.,  -2.,   7};
-
     signal_data_t result[] = { 5., 2.5, 10, 0., 25., 99.5, -44., 98.5, -45., 6.5};
 
     test(data, sizeof(data)/sizeof(signal_data_t),
@@ -150,8 +88,30 @@ void test_not_aliq_h9(){
          result);
 }
 
-int main(){
+long bench_avg(size_t signal_len, size_t filter_len){
+    long res = benchmark(signal_len, filter_len);
+    res += benchmark(signal_len, filter_len);
+    res += benchmark(signal_len, filter_len);
+    return res / 3;
+}
 
+void benchmark_serial(){
+    const size_t signal_len  = 1000000;
+    for(size_t filter_len = 0; filter_len < 50; filter_len++){
+        printf("%lu, ", bench_avg(signal_len, filter_len));
+    }
+    /*
+    for(size_t filter_len = 50; filter_len < 100; filter_len +=5 ){
+        printf("%lu, ", bench_avg(signal_len, filter_len));
+    }*/
+    puts("");
+}
+
+int main(int argc, char *argv[]){
+    (void)argc;
+    (void)argv;
+    benchmark_serial();
+    return 0;
     test_trivial();
     test_zero();
     test_negative();
