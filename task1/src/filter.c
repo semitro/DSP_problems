@@ -57,6 +57,9 @@ static inline void fir_simple(Signal *signal, const FIR_Filter *filter){
 #endif
 
 void apply_FIR(Signal *signal, const FIR_Filter *filter){
+    if(signal->len == 0 || filter->len == 0){
+        return;
+    }
     if(signal->len < filter->len){
         printf("filter::fir_simple: len of signal"
                " is less than len of filter!"); // where to include?

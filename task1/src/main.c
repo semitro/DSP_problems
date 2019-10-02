@@ -1,6 +1,6 @@
+#include <stddef.h>
 #include "test.h"
 #include "filter.h"
-#include <stddef.h>
 
 void test_trivial(){
     coeff_data_t    hh[]   = {1.};
@@ -94,24 +94,26 @@ long bench_avg(size_t signal_len, size_t filter_len){
     res += benchmark(signal_len, filter_len);
     return res / 3;
 }
-
+/* test performance */
 void benchmark_serial(){
     const size_t signal_len  = 1000000;
-    for(size_t filter_len = 0; filter_len < 50; filter_len++){
+    for(size_t filter_len = 1; filter_len < 50; filter_len++){
         printf("%lu, ", bench_avg(signal_len, filter_len));
     }
-    /*
+
     for(size_t filter_len = 50; filter_len < 100; filter_len +=5 ){
         printf("%lu, ", bench_avg(signal_len, filter_len));
-    }*/
+    }
     puts("");
 }
 
 int main(int argc, char *argv[]){
-    (void)argc;
+    (void)argc; //needed to make `pedantic-errors` compiler flag patient
     (void)argv;
-    benchmark_serial();
-    return 0;
+    puts("#############################################################");
+    puts("Hello!");
+    puts("This is implementation of FIR-filter made by Oshchepkov Artem");
+    puts("Now I'm gonna run some tests to show that the program is correct");
     test_trivial();
     test_zero();
     test_negative();
@@ -122,5 +124,6 @@ int main(int argc, char *argv[]){
     test_aliq4_h8();
     test_not_aliq_h7();
     test_not_aliq_h9();
+
     return 0;
 }

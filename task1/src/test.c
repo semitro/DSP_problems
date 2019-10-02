@@ -25,7 +25,7 @@ void test(signal_data_t *data, unsigned int sample_len,
           const signal_data_t *expected_out)
 {
     static unsigned int test_num = 1;
-    puts("\n***************");
+    puts("\n===============");
     printf("Test #%d\n", test_num);
     test_num++;
 
