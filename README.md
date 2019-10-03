@@ -12,6 +12,9 @@
 # Для запуска
 Радости #1 переходи в директорию `task1` и выполняй `./present.bash`
 То же самое делай для `task2`
+Или просто скопируй в терминал
+`git clone https://github.com/semitro/DSP_problems/`
+`cd DSP_problems && chmod +x ./full-present.bash && ./full-present.bash`
 
 # Смотри
 report.pdf для ознакомления с подробностями
