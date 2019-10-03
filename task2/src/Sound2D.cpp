@@ -6,12 +6,12 @@ Sound2D::Sound2D(double head_radius,  double sound_speed)
 
 }
 
-void Sound2D::setSoundGenerator(const std::function<float(float)> &generator)
+void Sound2D::setSoundGenerator(const std::function<double(double)> &generator)
 {
     this->generator = generator;
 }
 
-float Sound2D::calculateDelay(float angle, float distance)
+double Sound2D::calculateDelay(double angle, double distance)
 {
     // calculate distance to one ear of the listener
     const double r = sqrt(head_radius*head_radius + distance*distance
@@ -20,9 +20,9 @@ float Sound2D::calculateDelay(float angle, float distance)
     return r/sound_speed;
 }
 
-std::pair<float, float> Sound2D::makeSound(float angle, float distance, float t)
+std::pair<double, double> Sound2D::makeSound(double angle, double distance, double t)
 {
     const double left_ear  = generator(t + calculateDelay(angle, distance));
     const double right_ear = generator(t + calculateDelay(M_PI - angle, distance));
-    return std::pair<float, float>(left_ear, right_ear);
+    return std::pair<double, double>(left_ear, right_ear);
 }

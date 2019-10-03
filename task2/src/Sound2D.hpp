@@ -22,17 +22,17 @@ public:
     Sound2D(double head_radius, double sound_speed);
     /* @Returns sound by the generator shifted at left and right channels
      * that makes it sound 2D */
-    std::pair<float,float> makeSound(float angle, float distance, float time);
+    std::pair<double,double> makeSound(double angle, double distance, double time);
     /* Sets the function that generate sound wave from time, ex. sin(440*2pi*t) */
-    void setSoundGenerator(const std::function<float(float)> &generator);
+    void setSoundGenerator(const std::function<double(double)> &generator);
 
 private:
     /* @Returns signal delay in seconds */
-    float calculateDelay(float angle, float distance);
+    double calculateDelay(double angle, double distance);
     double head_radius;
     double sound_speed;
     /* gets time, returns amplitude */
-    std::function<float(float)> generator;
+    std::function<double(double)> generator;
 };
 
 #endif // AUDIO2D_HPP

@@ -1,8 +1,7 @@
 #include <iostream>
-#include <math.h>
 #include <utility>
 #include <string>
-
+#include <math.h>
 #include "AudioFile.hpp"
 #include "Sound2D.hpp"
 
@@ -14,7 +13,7 @@ AudioFile<double>::AudioBuffer buffer;
 
 #define BIT_DEPTH 16
 #define SAMPLE_RATE 42100
-#define SAMPLES_NUM 1000000
+#define SAMPLES_NUM 700000
 
 int main(int argc, char* argv[]){
     if(argc != 3){
@@ -32,9 +31,17 @@ int main(int argc, char* argv[]){
     /* init listener parameters */
     const double head_radius = 0.102; // meters
     const double sound_speed = 340.29;
-    const double distance_source = stoi(argv[1]);
-    /* rad/sec */
-    const double speed_rotating  = stoi(argv[2]); // rad / sec
+    double distance_source;
+    double speed_rotating;
+    try{
+        distance_source = stoi(argv[1]);
+        /* rad/sec */
+        speed_rotating  = stoi(argv[2]); // rad / sec
+    }catch(std::invalid_argument& e){
+        cout << "the parameters should be numbers!\n";
+        cout << "example: " << argv[0] << " 1. 6.14\n";
+        return 0;
+    }
     cout << "Generating sound with parameters:\n";
     cout << "Head radius = " << head_radius << " meters\n";
     cout << "Speed of sound = " << sound_speed << " meters\n";
@@ -49,12 +56,11 @@ int main(int argc, char* argv[]){
     double time;
     for (int i = 0; i < numSamples; i++)
     {
-        time = i/(double)SAMPLE_RATE;
-        angle = time*speed_rotating;
-        auto res = sound2d.makeSound(angle, distance_source, time);
-        buffer[0][i] = res.first;
-        buffer[1][i] = res.second;
-
+        time  = i/(double)SAMPLE_RATE; /* current time */
+        angle = time*speed_rotating;   /* make it rotate */
+        auto sample = sound2d.makeSound(angle, distance_source, time);
+        buffer[0][i] = sample.first;
+        buffer[1][i] = sample.second;
     }
     /* save result to FS */
     audio.setAudioBuffer(buffer);
