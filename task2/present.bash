@@ -33,4 +33,4 @@ sleep 1
 echo 1..
 sleep 1
 aplay result.wav &
-echo "If you want to play with parameters, run './sound2d distance speed' right here"
+echo "If you want to play with parameters, run './sound2d distance speed' at task2 directory"
