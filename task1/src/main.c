@@ -2,6 +2,7 @@
 #include "test.h"
 #include "filter.h"
 
+/* some simple tests */
 void test_trivial(){
     coeff_data_t    hh[]   = {1.};
     signal_data_t data[]   = {1., 2., 3., 4., 5.};
@@ -106,7 +107,7 @@ void benchmark_serial(){
     }
     puts("");
 }
-
+/* FIR filter testing */
 int main(int argc, char *argv[]){
     (void)argc; //needed to make `pedantic-errors` compiler flag patient
     (void)argv;

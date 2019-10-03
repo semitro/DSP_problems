@@ -43,7 +43,7 @@ static inline void fir_simple(Signal *signal, const FIR_Filter *filter){
     size_t h_index = 0;
     size_t i = signal->len;
 
-    while(i-- != window_shift){
+    while(i-- != window_shift){ // from the end to the beggining
         sum = 0;
         h_index = 0;
        for(size_t j = i - window_shift; j <= i; j++){
